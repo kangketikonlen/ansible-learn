@@ -1,0 +1,27 @@
+---
+# tasks file for roles/common
+- name: Update SSH configuration
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^PasswordAuthentication "
+    line: "PasswordAuthentication {{ ssh_password_authentication }}"
+  notify: Restart SSH service
+
+- name: Add current user to sudoers file
+  ansible.builtin.blockinfile:
+    path: /etc/sudoers
+    block: "{{ sudoers_block }}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK"
+
+- name: Configure locale settings
+  ansible.builtin.shell:
+    cmd: "{{ locale_gen_command }}"
+    creates: "/etc/locale.gen"
+  environment:
+    LC_ALL: "en_US.UTF-8"
+    LANG: "en_US.UTF-8"
+
+- name: Install essential packages
+  apt:
+    name: "{{ apt_packages }}"
+    state: present

@@ -1,0 +1,53 @@
+---
+# tasks file for roles/docker
+
+- name: Add Docker GPG key
+  apt_key:
+    url: "{{ docker_gpg_key_url }}"
+    state: present
+
+- name: Add Docker APT repository
+  apt_repository:
+    repo: "{{ docker_apt_repo }}"
+    state: present
+
+- name: Update apt packages
+  apt:
+    update_cache: false
+
+- name: Install docker essential packages
+  apt:
+    name: "{{ apt_packages }}"
+    state: present
+
+- name: Copy docker private key
+  ansible.builtin.copy:
+    src: "{{ private_key_src }}"
+    dest: "{{ private_key_dest }}"
+    mode: "{{ private_key_mode }}"
+
+- name: Change ownership and group of a directory and its contents
+  ansible.builtin.file:
+    path: "{{ private_key_dir }}"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    state: directory
+    recurse: yes
+
+- name: Ensure the existence of the Docker folder
+  ansible.builtin.file:
+    path: "{{ docker_remote_path }}"
+    state: directory
+
+- name: Add current user to the Docker group
+  user:
+    name: "{{ ansible_user }}"
+    groups: docker
+    append: yes
+    state: present
+
+- name: Run Docker login command
+  community.general.docker_login:
+    registry_url: ghcr.io
+    username: "{{ docker_username }}"
+    password: "{{ docker_github_token }}"

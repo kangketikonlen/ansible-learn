@@ -1,0 +1,16 @@
+---
+# vars file for roles/common
+
+ssh_password_authentication: "yes"
+locale_gen_command: "locale-gen en_US.UTF-8"
+sudoers_block: |
+  {{ ansible_user }} ALL=(ALL) NOPASSWD:ALL
+apt_packages:
+  - apt-transport-https
+  - ca-certificates
+  - curl
+  - gnupg-agent
+  - software-properties-common
+  - git
+  - btop
+  - gh

@@ -1,0 +1,26 @@
+---
+# tasks file for roles/webserver
+
+- name: Clone the repository
+  ansible.builtin.git:
+    repo: "{{ repository_url }}"
+    dest: "{{ repository_folder_dest }}"
+    version: "{{ repository_branch }}"
+    force: yes
+  environment:
+    GIT_SSH_COMMAND: "ssh -i {{ repository_private_key }}"
+  register: webserver_clone_result
+
+- name: Run Docker Compose
+  ansible.builtin.docker_compose:
+    project_src: "{{ repository_folder_dest }}"
+    project_name: "{{ repository_name }}"
+    state: present
+  register: webserver_compose_result
+
+- name: Check if the server is reachable
+  uri:
+    url: "http://{{ ansible_host }}:7080"
+    method: GET
+    return_content: no
+  register: webserver_get_result
