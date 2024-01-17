@@ -1,0 +1,27 @@
+---
+- name: Download and archive backup folder
+  hosts: all
+  become: yes
+
+  vars:
+    backup_folder_path: "/home/{{ ansible_user }}/backups"
+    local_download_path: "./downloads"
+
+  tasks:
+    - name: Archive the backup folder
+      archive:
+        path: "{{ backup_folder_path }}"
+        dest: "/tmp/backup_{{ ansible_date_time.iso8601_basic_short }}.zip"
+        format: zip
+      become: yes
+
+    - name: Download the archived backup
+      fetch:
+        src: "/tmp/backup_{{ ansible_date_time.iso8601_basic_short }}.zip"
+        dest: "{{ local_download_path }}"
+
+    - name: Remove temporary archive on the remote server
+      file:
+        path: "/tmp/backup_{{ ansible_date_time.iso8601_basic_short }}.zip"
+        state: absent
+      become: yes

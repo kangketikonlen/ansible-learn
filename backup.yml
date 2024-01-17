@@ -1,0 +1,43 @@
+---
+- name: Run backup script and set up cron jobs
+  hosts: all
+  become: yes
+
+  tasks:
+    - name: Copy the backup script to /usr/local/bin
+      copy:
+        src: ./scripts/backup_docker.sh
+        dest: /usr/local/bin/backup_docker
+        mode: "0755"
+
+    - name: Run the backup script
+      command: /usr/local/bin/backup_docker {{ ansible_user }}
+      become: yes
+
+    - name: Remove existing cron jobs
+      cron:
+        name: "backup_docker_morning"
+        state: absent
+        user: "{{ ansible_user }}"
+
+    - name: Set up cron job for morning at 5
+      cron:
+        name: "backup_docker_morning"
+        minute: 0
+        hour: 5
+        user: "{{ ansible_user }}"
+        job: "/usr/local/bin/backup_docker {{ ansible_user }}"
+
+    - name: Remove existing cron jobs
+      cron:
+        name: "backup_docker_night"
+        state: absent
+        user: "{{ ansible_user }}"
+
+    - name: Set up cron job for night at 19
+      cron:
+        name: "backup_docker_night"
+        minute: 0
+        hour: 19
+        user: "{{ ansible_user }}"
+        job: "/usr/local/bin/backup_docker {{ ansible_user }}"

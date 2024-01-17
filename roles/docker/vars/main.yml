@@ -5,9 +5,9 @@ apt_packages:
   - docker-compose
   - containerd.io
 
-private_key_src: "./files/id_rsa"
+private_key_src: "./files/key"
 private_key_dest: "/home/{{ ansible_user }}/.ssh/github_private"
-private_key_mode: 400
+private_key_mode: 0600
 private_key_dir: "/home/{{ ansible_user }}/.ssh"
 
 docker_gpg_key_url: https://download.docker.com/linux/ubuntu/gpg
