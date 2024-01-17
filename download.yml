@@ -5,7 +5,7 @@
 
   vars:
     backup_folder_path: "/home/{{ ansible_user }}/backups"
-    local_download_path: "./downloads"
+    local_download_path: "./downloads/{{ ansible_hostname }}/"
 
   tasks:
     - name: Archive the backup folder
@@ -19,6 +19,7 @@
       fetch:
         src: "/tmp/backup_{{ ansible_date_time.iso8601_basic_short }}.zip"
         dest: "{{ local_download_path }}"
+        flat: yes
 
     - name: Remove temporary archive on the remote server
       file:

@@ -3,6 +3,11 @@
   hosts: all
   become: yes
   gather_facts: true
+
+  tasks:
+    - name: Include secret variables
+      include_vars:
+        file: vars/secrets.yml
   
   roles:
     - common

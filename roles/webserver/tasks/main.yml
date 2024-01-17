@@ -16,19 +16,13 @@
     path: "{{ repository_folder_dest }}/.env"
   register: env_file_stat
 
-- name: Generate a random password
-  ansible.builtin.set_fact:
-    random_password: "{{ range(12) | map('random', 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789') | join }}"
-  register: random_password
-  when: env_file_stat.stat.exists == false
-
 - name: Create .env file
   ansible.builtin.copy:
     content: |
       # Mariadb environment
-      MYSQL_ROOT_PASSWORD={{ random_password }}
+      MYSQL_ROOT_PASSWORD={{ database_root_password }}
       MYSQL_USER=sysadmin
-      MYSQL_PASSWORD={{ random_password }}
+      MYSQL_PASSWORD={{ database_user_password }}
       # Openlitespeed environment
       TimeZone=Asia/Jakarta
       DOMAIN=localhost
@@ -42,10 +36,9 @@
     state: present
   register: webserver_compose_result
 
-- name: 30 secs of delay added waiting for webserver up
+- name: 5 secs of delay added waiting for webserver up
   pause:
-    seconds: 30
-  when: webserver_compose_result.services.litespeed.webserver.state.status != "running"
+    seconds: 5
 
 - name: Check if the server is reachable
   uri:

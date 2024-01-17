@@ -5,13 +5,7 @@ apt_packages:
   - docker-compose
   - containerd.io
 
-private_key_src: "./files/key"
-private_key_dest: "/home/{{ ansible_user }}/.ssh/github_private"
-private_key_mode: 0600
-private_key_dir: "/home/{{ ansible_user }}/.ssh"
-
 docker_gpg_key_url: https://download.docker.com/linux/ubuntu/gpg
 docker_apt_repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
 docker_remote_path: "{{ ansible_env.HOME }}/docker"
 docker_username: "kangketikonlen"
-docker_github_token: "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"
